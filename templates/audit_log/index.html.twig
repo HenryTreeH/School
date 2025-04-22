@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Scrape Config Audit Log{% endblock %}
+
+{% block body %}
+    <h1>Audit Log for Scrape Config</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Action</th>
+            <th>User</th>
+            <th>Changes</th>
+            <th>Logged At</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in logs %}
+            <tr>
+                <td>{{ log.entityId }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.username }}</td>
+                <td>
+                    <ul>
+                        {% for key, value in log.changeSet %}
+                            <li>{{ key }}:
+                                {% if value is iterable %}
+                                    {{ value[0] }} → {{ value[1] }}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>{{ log.loggedAt|date('Y-m-d H:i') }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5">No audit logs found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_scrape_config') }}" class="btn btn-primary">Back to Configs</a>
+{% endblock %}

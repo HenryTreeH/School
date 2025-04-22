@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+
+{% block title %}
+
+    <h1>Edit Scrape Configuration</h1>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Edit Scrape Configuration</h1>
+
+        {{ form_start(form) }}
+
+        <div class="mb-3">
+            {{ form_label(form.domain) }}
+            {{ form_widget(form.domain, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <h3>XPath Selectors</h3>
+        <div class="mb-3">
+            {{ form_label(form.overview_xpath) }}
+            {{ form_widget(form.overview_xpath, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.detail_xpath) }}
+            {{ form_widget(form.detail_xpath, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.title_xpath) }}
+            {{ form_widget(form.title_xpath, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.price_xpath) }}
+            {{ form_widget(form.price_xpath, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.description_xpath) }}
+            {{ form_widget(form.description_xpath, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.surface_xpath) }}
+            {{ form_widget(form.surface_xpath, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.bedrooms_xpath) }}
+            {{ form_widget(form.bedrooms_xpath, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.photo_xpath) }}
+            {{ form_widget(form.photo_xpath, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <a href="{{ path('app_scraped_pages') }}" class="btn btn-primary">Save Configuration</a>
+        {{ form_end(form) }}
+
+    </div>
+{% endblock %}
+

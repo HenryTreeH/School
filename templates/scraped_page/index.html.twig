@@ -1,0 +1,176 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Scraped Pages{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Scraping Dashboard</h1>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="scrapeTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pages-tab" data-bs-toggle="tab" data-bs-target="#pages" type="button" role="tab">Scraped Pages</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="configs-tab" data-bs-toggle="tab" data-bs-target="#configs" type="button" role="tab">Scrape Result</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab">Scraping Statistics</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">Recent Scrape Activity</button>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3" id="scrapeTabsContent">
+            <!-- Scraped Pages -->
+            <div class="tab-pane fade show active" id="pages" role="tabpanel">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>URL</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for page in scrapedPages %}
+                        <tr>
+                            <td>{{ page.id }}</td>
+                            <td>{{ page.title }}</td>
+                            <td>{{ page.url }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3">No scraped pages available</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Scrape Configurations -->
+            <div class="tab-pane fade" id="configs" role="tabpanel">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Domain</th>
+                        <th>Overview XPath</th>
+                        <th>Price XPath</th>
+                        <th>Detail XPath</th>
+                        <th>Title XPath</th>
+                        <th>Description XPath</th>
+                        <th>Surface XPath</th>
+                        <th>Bedrooms XPath</th>
+                        <th>Photo XPath</th>
+                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_LEAD') %}
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for config in configs %}
+                        <tr>
+                            <td>{{ config.id }}</td>
+                            <td>{{ config.domain }}</td>
+                            <td>{{ config.overviewXpath }}</td>
+                            <td>{{ config.priceXpath }}</td>
+                            <td>{{ config.detailXpath }}</td>
+                            <td>{{ config.titleXpath }}</td>
+                            <td>{{ config.descriptionXpath }}</td>
+                            <td>{{ config.surfaceXpath }}</td>
+                            <td>{{ config.bedroomsXpath }}</td>
+                            <td>{{ config.photoXpath }}</td><td>
+                                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_LEAD') %}
+                                    <a href="{{ path('app_scrape_config_edit', {'id': config.id}) }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_LEAD') %}
+                                    <form action="{{ path('app_scrape_config_delete', {'id': config.id}) }}" method="post" style="display: inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ config.id) }}">
+                                        <button class="btn btn-sm btn-danger" type="submit">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="11">No scrape configurations found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Scraping Statistics -->
+            <div class="tab-pane fade" id="stats" role="tabpanel">
+                {% if stats is defined %}
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Scrapes
+                            <span class="badge bg-primary rounded-pill">{{ stats.totalScrapes }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Successful Scrapes
+                            <span class="badge bg-success rounded-pill">{{ stats.successfulScrapes }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Failed Scrapes
+                            <span class="badge bg-danger rounded-pill">{{ stats.failedScrapes }}</span>
+                        </li>
+                    </ul>
+                {% else %}
+                    <p>No statistics available</p>
+                {% endif %}
+            </div>
+
+            <!-- Recent Logs -->
+            <div class="tab-pane fade" id="logs" role="tabpanel">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>User</th>
+                        <th>Scraper</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for log in recentLogs %}
+                        <tr>
+                            <td>{{ log.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>{{ log.user.email }}</td>
+                            <td>{{ log.scraperName }}</td>
+                            <td>
+                            <span class="badge bg-{{ log.status == 'success' ? 'success' : 'danger' }}">
+                                {{ log.status }}
+                            </span>
+                            </td>
+                            <td>
+                                {% if log.message %}
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="{{ log.message }}">
+                                        Details
+                                    </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">No recent activity</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -15,7 +15,7 @@ class HelloWorld extends Command
     {
         $this
             ->setDescription('Say hello!')
-            ->addArgument('name', InputArgument::REQUIRED, 'What is your name?');
+            ->addArgument('name', InputArgument::OPTIONAL, 'What is your name?', 'Guest'); // Default: "Guest"
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

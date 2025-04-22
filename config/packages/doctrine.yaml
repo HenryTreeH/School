@@ -8,6 +8,8 @@ doctrine:
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
+        logging: true  # Add this line to enable SQL logging
+        profiling: true # Collect profiling data for each query
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true

@@ -3,7 +3,7 @@
 namespace App\Commands;
 
 use GuzzleHttp\Exception\GuzzleException;
-use App\Utils;
+use App\Utils;  // ✅ Corrected namespace
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -67,7 +67,7 @@ class ScrapePage extends Command
         $detailUrls = $this->scrapeDetailPageUrls($scraperConfig, $overviewPage);
 
         foreach ($detailUrls as $index => $url) {
-            $output->writeln("📌 <info>[$index+1] Fetching:</info> $url");
+            $output->writeln("📌 <info>[" . ($index + 1) . "] Fetching:</info> $url"); // ✅ Fixed array index
             $detailData = $this->fetchDetailPageData($scraperConfig, $url);
 
             // ✅ Display Property Details in a Clear Format
@@ -84,12 +84,10 @@ class ScrapePage extends Command
         return Command::SUCCESS;
     }
 
-
-
     /**
      * @throws GuzzleException
      */
-   public function fetchOverviewPageData(array $scraperConfig): string
+    public function fetchOverviewPageData(array $scraperConfig): string
     {
         $overviewUrl = $scraperConfig['overview']['page'] ?? '';
         if (empty($overviewUrl)) {
@@ -135,17 +133,15 @@ class ScrapePage extends Command
                 $nodes = $xPath->query($fieldSelector);
 
                 if ($nodes && $nodes->length > 0) {
-                    $value = $nodes->item(0)->textContent;
+                    $value = trim($nodes->item(0)->textContent);
                     if ($fieldName === 'fotos_xpath') {
                         $fotosPrefix = $scraperConfig['details']['fotos_prefix'] ?? '';
                         $value = $fotosPrefix . $value;
                     }
                     $data[$fieldName] = $value;
                 } else {
-                    $data[$fieldName] = null;
+                    $data[$fieldName] = 'N/A';
                 }
-            } elseif (empty($fieldSelector)) {
-                throw new RuntimeException('Empty selector for field: ' . $fieldName);
             }
         }
 
@@ -159,29 +155,51 @@ class ScrapePage extends Command
         $password = '';
         $dbname = 'scraped_data';
 
+        // ✅ Create connection with proper encoding
         $conn = new mysqli($servername, $username, $password, $dbname);
+        $conn->set_charset("utf8mb4");
+
+        // ✅ Check connection
         if ($conn->connect_error) {
-            throw new RuntimeException('Connection failed: ' . $conn->connect_error);
+            throw new RuntimeException('❌ Database connection failed: ' . $conn->connect_error);
         }
 
-        $stmt = $conn->prepare('INSERT INTO scraped_pages (title, price, description, surface) VALUES (?, ?, ?, ?)');
+        // ✅ Check if table exists
+        $checkTable = $conn->query("SHOW TABLES LIKE 'scraped_pages'");
+        if ($checkTable->num_rows == 0) {
+            throw new RuntimeException('❌ Table "scraped_pages" does not exist. Please create it first.');
+        }
+
+        // ✅ Prepare the SQL statement
+        $stmt = $conn->prepare('INSERT INTO scraped_pages (title, price, description, surface, bedrooms, photo) VALUES (?, ?, ?, ?, ?, ?)');
         if (!$stmt) {
-            throw new RuntimeException('Prepare failed: ' . $conn->error);
+            throw new RuntimeException('❌ Prepare statement failed: ' . $conn->error);
         }
 
+        // ✅ Loop through data and insert into database
         foreach ($parsedDetailPages as $page) {
-            $title = $page['title_xpath'] ?? null;
-            $price = $page['price_xpath'] ?? null;
-            $description = $page['description_xpath'] ?? null;
-            $surface = $page['surface_xpath'] ?? 'N/A'; // Set a default value if surface is null
+            $title = $page['title_xpath'] ?? 'N/A';
+            $price = $page['price_xpath'] ?? 'N/A';
+            $description = $page['description_xpath'] ?? 'N/A';
+            $surface = $page['surface_xpath'] ?? 'N/A';
+            $bedrooms = $page['bedrooms_xpath'] ?? 'N/A';
+            $photo = $page['fotos_xpath'] ?? 'N/A';
 
-            $stmt->bind_param('ssss', $title, $price, $description, $surface);
-            $stmt->execute();
+            // ✅ Debugging output
+            echo "📌 Inserting: $title | $price | $description | $surface | $bedrooms | $photo\n";
+
+            if (!$stmt->bind_param('ssssss', $title, $price, $description, $surface, $bedrooms, $photo)) {
+                throw new RuntimeException('❌ Binding parameters failed: ' . $stmt->error);
+            }
+
+            if (!$stmt->execute()) {
+                throw new RuntimeException('❌ Execution failed: ' . $stmt->error);
+            }
         }
 
+        // ✅ Cleanup
         $stmt->close();
         $conn->close();
+        echo "✅ Successfully saved data to the database.\n";
     }
-
-
 }
