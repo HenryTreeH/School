@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 14, 2025 at 05:16 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Gegenereerd op: 22 apr 2025 om 14:04
+-- Serverversie: 10.4.32-MariaDB
+-- PHP-versie: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -26,7 +26,45 @@ USE `scraped_data`;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `doctrine_migration_versions`
+-- Tabelstructuur voor tabel `audit_log`
+--
+
+DROP TABLE IF EXISTS `audit_log`;
+CREATE TABLE `audit_log` (
+  `id` int(11) NOT NULL,
+  `entity` varchar(100) NOT NULL,
+  `entity_id` int(11) NOT NULL,
+  `action` varchar(10) NOT NULL,
+  `change_set` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '(DC2Type:json)' CHECK (json_valid(`change_set`)),
+  `username` varchar(100) NOT NULL,
+  `logged_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `audit_log`
+--
+
+INSERT INTO `audit_log` (`id`, `entity`, `entity_id`, `action`, `change_set`, `username`, `logged_at`) VALUES
+(1, 'test_entity', 1, 'create', '{\"field\":[\"old\",\"new\"]}', 'anonymous', '2025-04-17 10:22:57'),
+(2, 'test_entity', 1, 'create', '{\"field\":[\"old\",\"new\"]}', 'anonymous', '2025-04-17 10:26:17'),
+(3, 'scrape_config', 18, 'create', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 10:57:10'),
+(4, 'user', 5, 'login', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 11:45:27'),
+(5, 'user', 6, 'login', '[]', 'niels@treehouse.nl', '2025-04-17 11:46:07'),
+(6, 'user', 5, 'login', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 11:53:55'),
+(7, 'scrape_config', 3, 'delete', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 12:02:14'),
+(8, 'user', 5, 'login', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 12:06:56'),
+(9, 'scrape_config', 19, 'create', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 12:08:38'),
+(10, 'user', 12, 'login', '[]', 'lennart@gmail.com', '2025-04-17 12:10:58'),
+(11, 'user', 5, 'login', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 12:26:35'),
+(12, 'user', 13, 'login', '[]', 'hch@gmail.com', '2025-04-17 13:17:34'),
+(13, 'user', 5, 'login', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 13:17:40'),
+(14, 'scrape_config', 20, 'create', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 13:22:12'),
+(15, 'scrape_config', 11, 'delete', '[]', 'henry.ch.tsui@gmail.com', '2025-04-17 15:23:57');
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `doctrine_migration_versions`
 --
 
 DROP TABLE IF EXISTS `doctrine_migration_versions`;
@@ -37,7 +75,7 @@ CREATE TABLE `doctrine_migration_versions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Dumping data for table `doctrine_migration_versions`
+-- Gegevens worden geëxporteerd voor tabel `doctrine_migration_versions`
 --
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
@@ -51,12 +89,15 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20250414094150', '2025-04-14 14:18:25', 9),
 ('DoctrineMigrations\\Version20250414094337', '2025-04-14 14:23:24', 70),
 ('DoctrineMigrations\\Version20250414130722', '2025-04-14 15:14:02', 161),
-('DoctrineMigrations\\Version20250414131347', '2025-04-14 15:15:01', 137);
+('DoctrineMigrations\\Version20250414131347', '2025-04-14 15:15:01', 137),
+('DoctrineMigrations\\Version20250417073239', '2025-04-17 09:42:20', 72),
+('DoctrineMigrations\\Version20250417073924', '2025-04-17 09:42:20', 6),
+('DoctrineMigrations\\Version20250417080657', '2025-04-17 10:07:00', 33);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `messenger_messages`
+-- Tabelstructuur voor tabel `messenger_messages`
 --
 
 DROP TABLE IF EXISTS `messenger_messages`;
@@ -73,7 +114,7 @@ CREATE TABLE `messenger_messages` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `scraped_page`
+-- Tabelstructuur voor tabel `scraped_page`
 --
 
 DROP TABLE IF EXISTS `scraped_page`;
@@ -90,7 +131,7 @@ CREATE TABLE `scraped_page` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `scrape_config`
+-- Tabelstructuur voor tabel `scrape_config`
 --
 
 DROP TABLE IF EXISTS `scrape_config`;
@@ -108,11 +149,10 @@ CREATE TABLE `scrape_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `scrape_config`
+-- Gegevens worden geëxporteerd voor tabel `scrape_config`
 --
 
 INSERT INTO `scrape_config` (`id`, `domain`, `overview_xpath`, `detail_xpath`, `title_xpath`, `price_xpath`, `description_xpath`, `surface_xpath`, `bedrooms_xpath`, `photo_xpath`) VALUES
-(3, 'sadas', 'sadasd', 'asdad', 'asdasd', 'asdad', 'asdadas', 'asdasd', 'asdasd', 'asdasd'),
 (4, 'sadasdas', 'asdasdas', 'asdasd', 'asdad', 'asdasd', 'asdad', 'asdasd', 'asdasd', 'asdasd'),
 (5, 'asdddddd', 'sdad', 'ada', 'ada', 'adsa', 'adsa', 'asda', 'adad', 'asdad'),
 (6, 'TuncayMakelaar.nl', 'DIVIDVIDIVIDVIVIDIVVID', 'dsfs', 'asdasd', 'asddddddddddd', 'saddddddddd', 'asdad', 'asdasd', 'sadddddddddd'),
@@ -120,15 +160,17 @@ INSERT INTO `scrape_config` (`id`, `domain`, `overview_xpath`, `detail_xpath`, `
 (8, 'RaufMakelaar.fr', 'asdasdasd', 'sadasdas', 'asdasdasd', 'adad', 'asdad', 'adsadas', 'asdada', 'asdasda'),
 (9, 'gfd', 'sdfsd', 'asdad', 'asdasd', 'asdasd', 'saddddddddd', 'sadad', 'asdasd', 'adada'),
 (10, 'Yasirmakelaar.nl', 'sadasd', 'sada', 'dadasd', 'adada', 'dasdad', 'adsasdas', 'dadsad', 'adsad'),
-(11, 'asdas', 'dasdas', 'dasdas', 'dasdasd', 'adasd', 'adasda', 'dasdas', 'dadad', 'asdasda'),
 (12, 'Yasirmakelaar.nl', 'saasdas', 'dasasa', 'sdasdasd', 'asdasda', 'dasda', 'dasdas', 'dasdasd', 'adasd'),
 (13, 'sadasd', 'sdasdas', 'dasdadasd', 'asda', 'dsadadas', 'dasda', 'dasdadas', 'dasdada', 'dasdasd'),
-(15, 'Yasirmakelaar.nl', 'sdfsd', 'fsdfs', 'fsfs', 'sdfs', 'fsdfs', 'fsdfs', 'sdfsf', 'sfsd');
+(17, 'dsfsdf', 'fsdfs', 'sdfsd', 'fsfsd', 'fsdfs', 'fsfsd', 'sdfsdfsd', 'sdfsd', 'sdfsdf'),
+(18, 'asda', 'asdada', 'dasda', 'dadad', 'adas', 'dasda', 'dasdasd', 'asdads', 'asdads'),
+(19, 'henrymakkelaar.nl', 'asdas', 'asdad', 'asdasd', 'asdasd', 'adasda', 'dadas', 'adasda', 'dasdasd'),
+(20, 'Yasirmakelaar.nl', 'sdfsd', 'dsfs', '12123', 'fsdf', 'dasda', 'sfs', '12312', 'sfsd');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `scrape_log`
+-- Tabelstructuur voor tabel `scrape_log`
 --
 
 DROP TABLE IF EXISTS `scrape_log`;
@@ -142,18 +184,10 @@ CREATE TABLE `scrape_log` (
   `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `scrape_log`
---
-
-INSERT INTO `scrape_log` (`id`, `user_id`, `config_id`, `status`, `message`, `scraper_name`, `created_at`) VALUES
-(1, 10, 6, 'goed', 'dsadada', 'XH-Highlight', '2025-04-14 15:58:37'),
-(2, 11, NULL, 'started', NULL, 'ExampleScraper', '2025-04-14 16:05:40');
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user`
+-- Tabelstructuur voor tabel `user`
 --
 
 DROP TABLE IF EXISTS `user`;
@@ -166,7 +200,7 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `user`
+-- Gegevens worden geëxporteerd voor tabel `user`
 --
 
 INSERT INTO `user` (`id`, `email`, `roles`, `password`, `firstname`) VALUES
@@ -177,20 +211,28 @@ INSERT INTO `user` (`id`, `email`, `roles`, `password`, `firstname`) VALUES
 (8, 't.m@paraius.nl', '[\"ROLE_SCRAPER\"]', '$2y$13$jfwEuxAIwDGuAFubN0KjaejnXGdbpcCcBarZ997x..9TNbKt993Fe', 'Tuncay'),
 (9, 'y.r@paraius.nl', '[\"ROLE_SCRAPER\"]', '$2y$13$/Tngs68T7X1FttbpCSIZxek8HHUbL.KaMMMogVbNKhYOEHs7..8fy', 'Yasir'),
 (10, 'a.l@paraius.nl', '[\"ROLE_SCRAPER\"]', '$2y$13$dJdk5N4JEsXGpz7FV6K7M.3LBPWLuFVSYPErlQ2hf5ERkywhGUxU.', 'Anthony'),
-(11, 'benji@gmail.com', '[\"ROLE_SCRAPER\"]', '$2y$13$WOc54jeCX7gedCukqYnTIeUiquiiMXSWl5oZ7UAeVjhZy2O2xkTzC', 'benji');
+(11, 'benji@gmail.com', '[\"ROLE_SCRAPER\"]', '$2y$13$WOc54jeCX7gedCukqYnTIeUiquiiMXSWl5oZ7UAeVjhZy2O2xkTzC', 'benji'),
+(12, 'lennart@gmail.com', '[\"ROLE_ADMIN\"]', '$2y$13$.df8YEzfAURq4.qMYvEdquSiiBfw5zPzxBo4pJjd5EJDReyRhtWhy', 'Lennart'),
+(13, 'hch@gmail.com', '[]', '$2y$13$IQ4oQX8.Bb2vL747jgZcluD.LhaSmIUBZ2s41fP9bziCnEvqs5jLG', 'henry');
 
 --
--- Indexes for dumped tables
+-- Indexen voor geëxporteerde tabellen
 --
 
 --
--- Indexes for table `doctrine_migration_versions`
+-- Indexen voor tabel `audit_log`
+--
+ALTER TABLE `audit_log`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexen voor tabel `doctrine_migration_versions`
 --
 ALTER TABLE `doctrine_migration_versions`
   ADD PRIMARY KEY (`version`);
 
 --
--- Indexes for table `messenger_messages`
+-- Indexen voor tabel `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
   ADD PRIMARY KEY (`id`),
@@ -199,19 +241,19 @@ ALTER TABLE `messenger_messages`
   ADD KEY `IDX_75EA56E016BA31DB` (`delivered_at`);
 
 --
--- Indexes for table `scraped_page`
+-- Indexen voor tabel `scraped_page`
 --
 ALTER TABLE `scraped_page`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `scrape_config`
+-- Indexen voor tabel `scrape_config`
 --
 ALTER TABLE `scrape_config`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `scrape_log`
+-- Indexen voor tabel `scrape_log`
 --
 ALTER TABLE `scrape_log`
   ADD PRIMARY KEY (`id`),
@@ -219,52 +261,58 @@ ALTER TABLE `scrape_log`
   ADD KEY `IDX_E14E61EF24DB0683` (`config_id`);
 
 --
--- Indexes for table `user`
+-- Indexen voor tabel `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `UNIQ_IDENTIFIER_EMAIL` (`email`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT voor geëxporteerde tabellen
 --
 
 --
--- AUTO_INCREMENT for table `messenger_messages`
+-- AUTO_INCREMENT voor een tabel `audit_log`
+--
+ALTER TABLE `audit_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT voor een tabel `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `scraped_page`
+-- AUTO_INCREMENT voor een tabel `scraped_page`
 --
 ALTER TABLE `scraped_page`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `scrape_config`
+-- AUTO_INCREMENT voor een tabel `scrape_config`
 --
 ALTER TABLE `scrape_config`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
--- AUTO_INCREMENT for table `scrape_log`
+-- AUTO_INCREMENT voor een tabel `scrape_log`
 --
 ALTER TABLE `scrape_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT for table `user`
+-- AUTO_INCREMENT voor een tabel `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- Constraints for dumped tables
+-- Beperkingen voor geëxporteerde tabellen
 --
 
 --
--- Constraints for table `scrape_log`
+-- Beperkingen voor tabel `scrape_log`
 --
 ALTER TABLE `scrape_log`
   ADD CONSTRAINT `FK_E14E61EF24DB0683` FOREIGN KEY (`config_id`) REFERENCES `scrape_config` (`id`),
