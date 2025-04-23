@@ -38,6 +38,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $Firstname = null;
 
+    #[ORM\Column(type: "boolean", options: ["default" => 0])]
+    private bool $disabled = false;
+
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ScrapeLog::class)]
     private Collection $scrapeLogs;
 
@@ -66,7 +69,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -87,11 +89,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
+        $this->updateScraperRoleBasedOnStatus();  // Ensure roles are up-to-date
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        $roles[] = 'ROLE_USER';  // Guarantee every user has ROLE_USER
+        return array_unique($roles);  // Return unique roles
     }
 
     /**
@@ -100,7 +101,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
 
@@ -115,7 +115,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
     }
 
@@ -124,8 +123,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        // Clear any sensitive data
     }
 
     public function getFirstname(): ?string
@@ -136,13 +134,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFirstname(?string $Firstname): static
     {
         $this->Firstname = $Firstname;
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, ScrapeLog>
-     */
     public function getScrapeLogs(): Collection
     {
         return $this->scrapeLogs;
@@ -154,25 +148,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->scrapeLogs->add($scrapeLog);
             $scrapeLog->setUser($this);
         }
-
         return $this;
     }
 
     public function removeScrapeLog(ScrapeLog $scrapeLog): static
     {
         if ($this->scrapeLogs->removeElement($scrapeLog)) {
-            // set the owning side to null (unless already changed)
             if ($scrapeLog->getUser() === $this) {
                 $scrapeLog->setUser(null);
             }
         }
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, ScrapeLog>
-     */
     public function getScraperlogs(): Collection
     {
         return $this->scraperlogs;
@@ -184,19 +172,62 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->scraperlogs->add($scraperlog);
             $scraperlog->setUser($this);
         }
-
         return $this;
     }
 
     public function removeScraperlog(ScrapeLog $scraperlog): static
     {
         if ($this->scraperlogs->removeElement($scraperlog)) {
-            // set the owning side to null (unless already changed)
             if ($scraperlog->getUser() === $this) {
                 $scraperlog->setUser(null);
             }
         }
-
         return $this;
     }
+
+    // Getter and Setter for the disabled field
+
+    public function getDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
+    public function setDisabled(bool $disabled): static
+    {
+        $this->disabled = $disabled;
+        return $this;
+    }
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $scraperEnabled = true;  // Default to true (enabled)
+
+    public function getScraperEnabled(): bool
+    {
+        return $this->scraperEnabled;
+    }
+
+    public function setScraperEnabled(bool $scraperEnabled): self
+    {
+        $this->scraperEnabled = $scraperEnabled;
+        $this->updateScraperRoleBasedOnStatus();  // Ensure roles are updated
+        return $this;
+    }
+
+    // Update the roles array based on scraperEnabled status
+    public function updateScraperRoleBasedOnStatus(): void
+    {
+        $roles = $this->roles;
+
+        // Add or remove ROLE_SCRAPER based on scraperEnabled
+        if ($this->scraperEnabled) {
+            if (!in_array('ROLE_SCRAPER', $roles, true)) {
+                $roles[] = 'ROLE_SCRAPER';
+            }
+        } else {
+            $roles = array_filter($roles, fn($role) => $role !== 'ROLE_SCRAPER');
+        }
+
+        $this->roles = array_values($roles);  // Reindex the roles array
+    }
 }
+

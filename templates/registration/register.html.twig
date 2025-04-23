@@ -27,9 +27,10 @@
                     {{ form_label(registrationForm.Firstname) }}
                     {{ form_widget(registrationForm.Firstname, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(registrationForm.Firstname) }}
+                </div>
 
                 <div class="mb-3">
-                    {{ form_label(registrationForm.plainPassword, 'Password') }}
+                    {{ form_label(registrationForm.plainPassword) }}
                     {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(registrationForm.plainPassword) }}
                 </div>
@@ -39,6 +40,15 @@
                     {{ form_label(registrationForm.agreeTerms, null, {'attr': {'class': 'form-check-label'}}) }}
                     {{ form_errors(registrationForm.agreeTerms) }}
                 </div>
+
+                {# Only show the roles field if the user is an admin #}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.roles, null, {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+                        {{ form_widget(registrationForm.roles, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_errors(registrationForm.roles) }}
+                    </div>
+                {% endif %}
 
                 <button type="submit" class="btn btn-primary w-100">Register</button>
 

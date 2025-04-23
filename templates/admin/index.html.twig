@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block body %}
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="create-tab" data-bs-toggle="tab" data-bs-target="#create" type="button" role="tab">Create</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#delete" type="button" role="tab">Users</button>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3" id="adminTabsContent">
+        <div class="tab-pane fade show active" id="create" role="tabpanel" aria-labelledby="create-tab">
+            <h3 class="mb-4 text-dark">Create User</h3>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    {% if registrationForm is defined %}
+                        {{ form_start(registrationForm, {
+                            'action': path('admin_create_user'),
+                            'attr': {'id': 'createUserForm'}
+                        }) }}
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.Firstname, null, {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+                            {{ form_widget(registrationForm.Firstname, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.Firstname) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.plainPassword, null, {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+                            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.plainPassword) }}
+                        </div>
+
+                        {% if registrationForm.roles is defined %}
+                            <div class="mb-3">
+                                {{ form_label(registrationForm.roles, null, {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+                                <div class="d-flex flex-column gap-2">
+                                    {% for choice in registrationForm.roles %}
+                                        <div class="form-check">
+                                            {{ form_widget(choice, {
+                                                'attr': {'class': 'form-check-input'}
+                                            }) }}
+                                            {{ form_label(choice, null, {
+                                                'label_attr': {'class': 'form-check-label text-dark'}
+                                            }) }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {{ form_errors(registrationForm.roles) }}
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3 form-check">
+                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                            {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label text-dark'}}) }}
+                            {{ form_errors(registrationForm.agreeTerms) }}
+                        </div>
+
+                        <button class="btn btn-primary w-100">Create User</button>
+                        {{ form_end(registrationForm) }}
+                    {% else %}
+                        <div class="alert alert-warning">
+                            Registration form not available.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="delete" role="tabpanel" aria-labelledby="delete-tab">
+            <h3 class="mb-4 text-dark">Users List</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>First Name</th>
+                        <th>Roles</th>
+                        <th>Status</th>  {# Added Status column #}
+                        <th>Delete</th>
+                        <th>Edit</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.firstname }}</td>
+                            <td>
+                                {% for role in user.roles %}
+                                    <span class="badge bg-secondary">{{ role }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <form action="{{ path('admin_toggle_scraper', {id: user.id}) }}" method="POST" class="d-inline">
+                                    <div class="form-check form-switch">
+                                        <input type="hidden" name="scraperEnabled" value="0">
+                                        <input class="form-check-input" type="checkbox"
+                                               id="scraperEnabledSwitch{{ user.id }}"
+                                               name="scraperEnabled"
+                                               value="1"
+                                                {{ user.scraperEnabled ? 'checked' : '' }}
+                                               onchange="this.form.submit()">
+                                        <label class="form-check-label" for="scraperEnabledSwitch{{ user.id }}">
+                                            {{ user.scraperEnabled ? 'Scraper Enabled' : 'Scraper Disabled' }}
+                                        </label>
+                                    </div>
+                                </form>
+                            </td>
+
+                            <td>
+                                {{ form(deleteForms[user.id]) }}
+                            </td>
+                            <td>
+                                <a href="{{ path('admin_edit_user', {id: user.id}) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No users found</td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

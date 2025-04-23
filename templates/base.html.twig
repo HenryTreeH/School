@@ -31,10 +31,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_scraped_pages') }}">Results</a>
                     </li>
+                {% endif %}
+
+                {% if is_granted('ROLE_LEAD') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_scrape_config_audit_log') }}">Audit Log</a>
-                    </li>
                 {% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_admin') }}">Admin</a>
+                            </li>
+                        {% endif %}
             </ul>
 
             <div class="d-flex align-items-center">

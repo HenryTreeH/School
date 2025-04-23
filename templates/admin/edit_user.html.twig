@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block body %}
+    <h3 class="mb-4 text-dark">Edit User</h3>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            {{ form_start(form) }}
+
+            <div class="mb-3">
+                {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+                {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.Firstname, null, {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+                {{ form_widget(form.Firstname, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.Firstname) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'form-label fw-bold text-dark'}}) }}
+                {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.plainPassword) }}
+            </div>
+
+            <div class="mb-3 form-check">
+                {{ form_widget(form.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.agreeTerms, null, {'label_attr': {'class': 'form-check-label text-dark'}}) }}
+                {{ form_errors(form.agreeTerms) }}
+            </div>
+
+            {% if form.roles is defined %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">Roles</label>
+                    <div class="d-flex flex-column gap-2">
+                        {% for choice in form.roles %}
+                            <div class="form-check">
+                                {{ form_widget(choice, {
+                                    'attr': {'class': 'form-check-input'}
+                                }) }}
+                                {{ form_label(choice, null, {
+                                    'label_attr': {'class': 'form-check-label text-dark'}
+                                }) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ form_errors(form.roles) }}
+                </div>
+            {% endif %}
+
+            <button class="btn btn-primary w-100">Save Changes</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
